@@ -26,8 +26,6 @@ func main()  {
     }
     encodedBuf.Write(p)
 
-    // ------------------------------------------------------------
-
     decodedPerson := new(pb.Person)
     if err := proto.Unmarshal(encodedBuf.Bytes(), decodedPerson); err!= nil {
         fmt.Println(err)
@@ -41,4 +39,29 @@ func main()  {
     person.Phones = decodedPerson.GetPhones()
 
     fmt.Println(person)
+
+    // ------------------------------------------------------------
+
+    person = &structs.Person{
+      Name: "Xiaohui Wang",
+      Id: 10,
+      Email: "example@pinterest.com",
+      Phones: []*pb.Person_PhoneNumber{
+          {Number: "555-4321", Type: pb.Person_HOME},
+      },
+    }
+    var w bytes.Buffer
+    _, err = person.Encode(&w)
+    if err != nil {
+        fmt.Println(err)
+        return
+    }
+
+    emptyPerson := &structs.Person{}
+    _, err = emptyPerson.Decode(&w)
+    if err != nil {
+      fmt.Println(err)
+      return
+    }
+    fmt.Println(emptyPerson)
 }

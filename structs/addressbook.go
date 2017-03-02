@@ -1,6 +1,9 @@
 package structs
 
 import (
+    "io"
+    "io/ioutil"
+    "github.com/golang/protobuf/proto"
     pb "github.com/wang502/pbuf/protobuf"
 )
 
@@ -28,6 +31,44 @@ type Person struct {
   Id     int32
   Email  string
   Phones []*pb.Person_PhoneNumber
+}
+
+// Encode the Person to a buffer.
+// Returns number of bytes written and any error occurs
+func (p *Person) Encode(w io.Writer) (int, error) {
+    pb := &pb.Person{
+        Name    : p.Name,
+        Id      : p.Id,
+        Email   : p.Email,
+        Phones  : p.Phones,
+    }
+    data, err := proto.Marshal(pb)
+    if err != nil {
+        return -1, err
+    }
+
+    return w.Write(data)
+}
+
+// Decode the Person from a buffer.
+// Returns the number of bytes read and any error if occurs
+func (p *Person) Decode(r io.Reader) (int, error) {
+    data, err := ioutil.ReadAll(r)
+    if err != nil {
+        return -1, err
+    }
+
+    pb := &pb.Person{}
+    if err := proto.Unmarshal(data, pb); err != nil {
+        return -1, err
+    }
+
+    p.Name = pb.GetName()
+    p.Id = pb.GetId()
+    p.Email = pb.GetEmail()
+    p.Phones = pb.GetPhones()
+
+    return len(data), nil
 }
 
 type Person_PhoneNumber struct {
