@@ -8,7 +8,7 @@
 
 // [START declaration]
 syntax = "proto3";
-package tutorial;
+package protobuf;
 // [END declaration]
 
 // [START java_declaration]
